@@ -642,7 +642,8 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
     requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList.add('lit');});});
   }
 
-  // ambient drift: a few near-invisible motes floating slowly behind the page
+  // ambient network: motes drift as before, but now they briefly link as they pass,
+  // and once in a while a few of them gather into a loose pattern, hold, and let go.
   try{
     var cv=document.getElementById('ambient');
     if(cv&&!reduce&&cv.getContext){
@@ -658,42 +659,204 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
           c.fillStyle=g;c.fillRect(0,0,d,d);return s;
         };
         var spGreen=sprite('23,151,56'),spGrey=sprite('129,129,150');
+        var LGREY='rgb(129,129,150)',LGREEN='rgb(23,151,56)';
+
+        // tuning: connect radius scales gently with viewport, grid cell matches it
+        var LINK=130,LINK2=LINK*LINK,CELL=LINK,MARGIN=90,SEP2=0;
+        var REL=0.02;    // velocity always eases back to its own drift, so nothing runs away
+        var SPR=0.0006;  // cluster spring toward the shared center, very soft
+        var MAXC=2;      // at most two patterns alive at once
+
+        var clusters=[],clid=0,cool=0,lastCX=-1,lastCY=-1;
+        var smooth=function(x){if(x<0)x=0;else if(x>1)x=1;return x*x*(3-2*x);};
 
         var seed=function(){
           var n=Math.max(14,Math.min(34,Math.round(W/52)));
           parts=[];
           for(var i=0;i<n;i++){
+            var ph=Math.random()*Math.PI*2,s=0.05+Math.random()*0.14;
             parts.push({
               x:Math.random()*W,y:Math.random()*H,
               r:0.8+Math.random()*1.6,
-              s:0.05+Math.random()*0.14,
-              ph:Math.random()*Math.PI*2,
+              s:s,ph:ph,
+              vx:Math.sin(t+ph)*0.12,vy:-s,
               a:0.07+Math.random()*0.08,
-              green:Math.random()<0.45
+              green:Math.random()<0.45,
+              cl:0,grab:0,ea:0
             });
           }
+          clusters=[];clid=0;cool=200+Math.random()*240;lastCX=-1;lastCY=-1;
         };
+
+        // spatial grid: cells sized to the connect radius, so pair tests stay cheap
+        var gw=1,gh=1,grid=[];
+        var sizeGrid=function(){
+          gw=Math.max(1,Math.ceil(W/CELL));gh=Math.max(1,Math.ceil(H/CELL));
+          grid=[];
+          for(var i=0;i<gw*gh;i++){grid.push([]);}
+        };
+
         var size=function(){
           W=window.innerWidth;H=window.innerHeight;
           cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
           ctx.setTransform(dpr,0,0,dpr,0,0);
+          LINK=Math.max(90,Math.min(150,W*0.11));
+          LINK2=LINK*LINK;CELL=LINK;MARGIN=Math.max(70,LINK*0.7);
+          var sep=Math.min(W,H)*0.35;SEP2=sep*sep;
+          sizeGrid();
           seed();
         };
+
+        // start a new pattern: a mote with enough close neighbors, away from the
+        // edges and away from where the last pattern lived
+        var trySpawn=function(){
+          var n=parts.length;
+          for(var att=0;att<6;att++){
+            var i=(Math.random()*n)|0,p=parts[i];
+            if(p.cl)continue;
+            if(p.x<MARGIN||p.x>W-MARGIN||p.y<MARGIN||p.y>H-MARGIN)continue;
+            if(lastCX>=0){
+              var lx=p.x-lastCX,ly=p.y-lastCY;
+              if(lx*lx+ly*ly<SEP2)continue;
+            }
+            var near=[],grab2=LINK2*0.9,j,dx,dy,d2;
+            for(j=0;j<n;j++){
+              if(j===i||parts[j].cl)continue;
+              dx=parts[j].x-p.x;dy=parts[j].y-p.y;d2=dx*dx+dy*dy;
+              if(d2<grab2){near.push({j:j,d:d2});}
+            }
+            if(near.length<3)continue;
+            near.sort(function(a,b){return a.d-b.d;});
+            var m=[i],take=Math.min(near.length,3+((Math.random()*3)|0)),k;
+            for(k=0;k<take;k++){m.push(near[k].j);}
+            var sx=0,sy=0;
+            for(k=0;k<m.length;k++){sx+=parts[m[k]].x;sy+=parts[m[k]].y;}
+            var mx=sx/m.length,my=sy/m.length,ox=[],oy=[];
+            for(k=0;k<m.length;k++){
+              ox.push((parts[m[k]].x-mx)*0.42); // settle into a loose shape, not a knot
+              oy.push((parts[m[k]].y-my)*0.42);
+            }
+            clid++;
+            for(k=0;k<m.length;k++){parts[m[k]].cl=clid;}
+            clusters.push({m:m,ox:ox,oy:oy,age:0,tin:90,hold:120+Math.random()*100,tout:120,rel:false});
+            lastCX=mx;lastCY=my;
+            return true;
+          }
+          return false;
+        };
+
+        var stepClusters=function(){
+          if(cool>0){cool--;}
+          else if(clusters.length<MAXC){cool=trySpawn()?(300+Math.random()*360):90;}
+          for(var ci=clusters.length-1;ci>=0;ci--){
+            var c=clusters[ci],k,mp,u=++c.age,e;
+            if(u<c.tin){e=smooth(u/c.tin);}
+            else if(u<c.tin+c.hold){e=1;}
+            else if(u<c.tin+c.hold+c.tout){e=1-smooth((u-c.tin-c.hold)/c.tout);}
+            else{e=-1;}
+            if(e<0){
+              for(k=0;k<c.m.length;k++){mp=parts[c.m[k]];mp.cl=0;mp.grab=0;}
+              clusters.splice(ci,1);
+              var cd=240+Math.random()*240;if(cool<cd)cool=cd; // breathe before the next one
+              continue;
+            }
+            var sx=0,sy=0;
+            for(k=0;k<c.m.length;k++){sx+=parts[c.m[k]].x;sy+=parts[c.m[k]].y;}
+            var mx=sx/c.m.length,my=sy/c.m.length;
+            if(!c.rel&&u>=c.tin+c.hold){
+              c.rel=true; // the hold ends: one tiny outward sigh so the group truly parts
+              for(k=0;k<c.m.length;k++){
+                mp=parts[c.m[k]];
+                var rx=mp.x-mx,ry=mp.y-my,rd=Math.sqrt(rx*rx+ry*ry);
+                if(rd>1){mp.vx+=rx/rd*0.06;mp.vy+=ry/rd*0.06;}
+              }
+            }
+            for(k=0;k<c.m.length;k++){
+              mp=parts[c.m[k]];
+              mp.grab=e;
+              mp.vx+=(mx+c.ox[k]-mp.x)*SPR*e;
+              mp.vy+=(my+c.oy[k]-mp.y)*SPR*e;
+            }
+          }
+        };
+
+        var move=function(){
+          for(var i=0;i<parts.length;i++){
+            var p=parts[i];
+            var tvx=Math.sin(t+p.ph)*0.12;                  // the old sway, as a target velocity
+            var tvy=-p.s+Math.cos(t*0.8+p.ph*1.7)*0.03;     // slow rise with a faint wander
+            p.vx+=(tvx-p.vx)*REL;
+            p.vy+=(tvy-p.vy)*REL;
+            p.x+=p.vx;p.y+=p.vy;
+            if(p.grab<0.02){ // gathered motes skip recycling so a pattern never snaps
+              if(p.y<-10){p.y=H+10;p.x=Math.random()*W;}
+              if(p.x<-10){p.x=W+10;}else if(p.x>W+10){p.x=-10;}
+            }
+            var edge=Math.min(1,(p.y+10)/90,(H+10-p.y)/90);
+            p.ea=edge>0?edge:0;
+          }
+        };
+
+        var line=function(p,q){
+          var dx=q.x-p.x,dy=q.y-p.y,d2=dx*dx+dy*dy;
+          if(d2>=LINK2)return;
+          var ss=smooth(1-Math.sqrt(d2)/LINK); // breathes in on approach, out on parting
+          var bond=(p.cl&&p.cl===q.cl)?(p.grab<q.grab?p.grab:q.grab):0;
+          var a=ss*(0.075+0.062*bond)*(p.ea<q.ea?p.ea:q.ea);
+          var gp=p.green&&q.green; // green only when both ends are green, so it stays rare
+          if(gp)a*=0.85;
+          if(a<0.005)return;
+          ctx.globalAlpha=a;
+          ctx.strokeStyle=gp?LGREEN:LGREY;
+          ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+        };
+
+        var links=function(){
+          var i,n=parts.length;
+          for(i=0;i<gw*gh;i++){grid[i].length=0;}
+          for(i=0;i<n;i++){
+            var p=parts[i];
+            var cx=(p.x/CELL)|0;if(cx<0)cx=0;else if(cx>=gw)cx=gw-1;
+            var cy=(p.y/CELL)|0;if(cy<0)cy=0;else if(cy>=gh)cy=gh-1;
+            grid[cy*gw+cx].push(i);
+          }
+          ctx.lineWidth=1;
+          for(var gy=0;gy<gh;gy++){
+            for(var gx=0;gx<gw;gx++){
+              var b=grid[gy*gw+gx];
+              if(!b.length)continue;
+              for(var a=0;a<b.length;a++){
+                var pa=parts[b[a]],c,o;
+                for(c=a+1;c<b.length;c++){line(pa,parts[b[c]]);}
+                // forward neighbor cells only, so each pair is tested exactly once
+                if(gx+1<gw){o=grid[gy*gw+gx+1];for(c=0;c<o.length;c++){line(pa,parts[o[c]]);}}
+                if(gy+1<gh){
+                  o=grid[(gy+1)*gw+gx];for(c=0;c<o.length;c++){line(pa,parts[o[c]]);}
+                  if(gx>0){o=grid[(gy+1)*gw+gx-1];for(c=0;c<o.length;c++){line(pa,parts[o[c]]);}}
+                  if(gx+1<gw){o=grid[(gy+1)*gw+gx+1];for(c=0;c<o.length;c++){line(pa,parts[o[c]]);}}
+                }
+              }
+            }
+          }
+        };
+
+        var dots=function(){
+          for(var i=0;i<parts.length;i++){
+            var p=parts[i];
+            ctx.globalAlpha=p.a*p.ea*(0.85+0.2*Math.sin(t*2+p.ph))*(1+0.22*p.grab);
+            var sz=p.r*8;
+            ctx.drawImage(p.green?spGreen:spGrey,p.x-sz/2,p.y-sz/2,sz,sz);
+          }
+        };
+
         var frame=function(){
           if(!running)return;
           t+=0.004;
           ctx.clearRect(0,0,W,H);
-          for(var i=0;i<parts.length;i++){
-            var p=parts[i];
-            p.y-=p.s;
-            p.x+=Math.sin(t+p.ph)*0.14;
-            if(p.y<-10){p.y=H+10;p.x=Math.random()*W;}
-            if(p.x<-10){p.x=W+10;}else if(p.x>W+10){p.x=-10;}
-            var edge=Math.min(1,(p.y+10)/90,(H+10-p.y)/90);
-            ctx.globalAlpha=p.a*(edge>0?edge:0)*(0.85+0.2*Math.sin(t*2+p.ph));
-            var sz=p.r*8;
-            ctx.drawImage(p.green?spGreen:spGrey,p.x-sz/2,p.y-sz/2,sz,sz);
-          }
+          stepClusters();
+          move();
+          links();
+          dots();
           ctx.globalAlpha=1;
           raf=requestAnimationFrame(frame);
         };

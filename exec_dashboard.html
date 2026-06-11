@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLIP — Executive Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#09090a;--panel:#0e0f11;--panel2:#121317;--ink:#f3f5f8;--grey:#9aa0ac;--soft:#6b6f78;--line:#1d1e23;--line2:#26272d;--red:#ED1915;--gold:#FBB40E;--green:#179738;--green2:#2bd46e;--blue:#0968D4;--greyc:#818196;}
+*{box-sizing:border-box}
+html,body{margin:0;overflow-x:hidden;background:radial-gradient(1200px 700px at 50% -8%,#131418 0%,#09090a 60%,#050506 100%);color:var(--ink);font-family:'Manrope',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1120px;margin:0 auto;padding:34px 26px 56px;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 20px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#0e0f12,#0a0a0c);margin-bottom:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:11px}
+.brand .clip{font-size:20px;font-weight:800;letter-spacing:.02em}
+.brand .pb{font-size:9px;letter-spacing:.2em;color:var(--soft);font-weight:700}
+.brand .dotsh{display:flex;flex-direction:column;gap:2px;margin:0 1px}
+.brand .dotsh i{width:5px;height:5px;border-radius:50%}
+.brand .cl{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.topright{display:flex;align-items:center;gap:12px}
+.illus{font-size:10px;letter-spacing:.12em;font-weight:800;text-transform:uppercase;color:var(--gold);border:1px solid rgba(251,180,14,.5);border-radius:7px;padding:6px 11px}
+.dl{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:700;color:var(--ink);background:#16181c;border:1px solid var(--line2);border-radius:9px;padding:9px 14px;cursor:pointer;transition:.16s}
+.dl:hover{border-color:var(--green);color:#fff}
+.tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.tab{font-size:13.5px;font-weight:700;color:var(--soft);padding:12px 15px;cursor:pointer;position:relative;white-space:nowrap;transition:.15s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--grey)}
+.tab.active{color:var(--ink)}
+.tab.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--green),var(--green2));box-shadow:0 0 14px rgba(43,212,110,.5)}
+.tab.locked{cursor:not-allowed}
+.tab .lk{opacity:.55}
+.titlerow{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;margin:2px 0 16px}
+h1{font-size:33px;font-weight:800;letter-spacing:-.02em;margin:0}
+.shine{position:relative;display:inline-block}
+.shine::after{content:"";position:absolute;left:0;right:46%;bottom:-8px;height:1.5px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--green),var(--green2),var(--green),transparent);background-size:220% 100%;animation:slide 4.5s linear infinite;opacity:.7}
+@keyframes slide{to{background-position:220% 0}}
+.filters{display:flex;gap:12px;flex-wrap:wrap}
+.filter{display:flex;flex-direction:column;gap:6px}
+.filter label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);font-weight:700;padding-left:3px}
+.sel{position:relative}
+.sel select{appearance:none;-webkit-appearance:none;font:inherit;font-size:13.5px;font-weight:700;color:var(--ink);background:linear-gradient(180deg,#16181d,#0e0f12);border:1px solid var(--line2);border-radius:10px;padding:10px 34px 10px 13px;cursor:pointer;transition:.16s;min-width:132px;outline:none}
+.sel select:hover{border-color:var(--green)}
+.sel::after{content:"\25BE";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--green2);pointer-events:none;font-size:12px}
+.ctx{color:var(--grey);font-size:14px;margin:0 0 26px}
+.narrative{font-size:19px;line-height:1.7;color:#cfd3da;max-width:880px;margin:0 0 16px}
+.krisk{font-size:16px;line-height:1.6;color:#cfd3da;max-width:880px;margin:0 0 26px;padding:12px 16px;border-left:3px solid var(--red);background:rgba(237,25,21,.06);border-radius:8px}
+.krisk b{color:#ff6a66}
+.callout{color:var(--ink);font-weight:700;cursor:pointer;border-bottom:2px solid rgba(23,151,56,.5);padding-bottom:1px;transition:.18s;white-space:nowrap}
+.callout:hover{border-bottom-color:var(--green2);color:#fff;text-shadow:0 0 18px rgba(43,212,110,.35)}
+.callout.hot{color:#f3f5f8;border-bottom-color:rgba(237,25,21,.55)}
+.callout.hot .n{color:#ff5a55;font-weight:800}
+.callout.hot:hover{color:#fff;border-bottom-color:var(--red)}
+.callout.hot:hover .n{color:#ff8b88}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{position:relative;background:linear-gradient(180deg,var(--panel),#0b0c0e);border:1px solid var(--line);border-radius:14px;padding:18px 16px 16px;cursor:pointer;overflow:hidden;transition:.2s;min-height:126px}
+.kpi:hover{border-color:var(--line2);transform:translateY(-2px)}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),var(--green2),var(--green),transparent);background-size:200% 100%;animation:slide 4s linear infinite;opacity:.45}
+.kpi:hover::before{opacity:1}
+.kpi.alert::before{background:linear-gradient(90deg,transparent,var(--red),#ff6a66,var(--red),transparent);background-size:200% 100%}
+.kpi .lab{font-size:12.5px;color:var(--grey);font-weight:600;line-height:1.35;min-height:34px}
+.kpi .val{font-size:38px;font-weight:800;letter-spacing:-.02em;margin:10px 0 4px;background:linear-gradient(100deg,#f3f5f8 0%,#bfeccd 26%,#2bd46e 50%,#bfeccd 74%,#f3f5f8 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 6.5s linear infinite}
+.kpi .val.red{background:linear-gradient(100deg,#f3f5f8 0%,#ffc3c0 26%,#ED1915 50%,#ffc3c0 74%,#f3f5f8 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text}
+.kpi .val.gold{background:linear-gradient(100deg,#f3f5f8 0%,#ffe7ad 26%,#FBB40E 50%,#ffe7ad 74%,#f3f5f8 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text}
+.kpi .val.grey{background:linear-gradient(100deg,#f3f5f8 0%,#d2d5dd 26%,#9aa0ac 50%,#d2d5dd 74%,#f3f5f8 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text}
+@keyframes sheen{to{background-position:-300% 0}}
+.kpi .sub{font-size:12.5px;color:var(--soft);font-weight:500}
+.kpi .sub b{color:var(--green2);font-weight:700}
+.kpi .sub b.warn{color:var(--gold)}
+.kpi .open{position:absolute;right:13px;bottom:12px;font-size:11px;color:var(--soft);opacity:0;transition:.2s}
+.kpi:hover .open{opacity:1}
+.chart-panel{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#0e0f12,#0a0a0c);padding:20px 22px 16px;margin-bottom:8px}
+.cp-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.cp-head h3{margin:0;font-size:16px;font-weight:800}
+.cp-head .sm{font-size:12.5px;color:var(--soft)}
+.legend{display:flex;gap:16px;font-size:12.5px;font-weight:700}
+.legend span{display:flex;align-items:center;gap:6px;color:var(--grey)}
+.legend i{width:10px;height:10px;border-radius:3px}
+#chart{width:100%;height:auto;display:block}
+.cline{stroke-dasharray:1600;stroke-dashoffset:1600;animation:draw 1.7s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hint{color:var(--soft);font-size:12.5px;margin:16px 2px 0}
+.modal{position:fixed;inset:0;background:rgba(4,5,7,.74);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:60;padding:24px}
+.modal.open{display:flex}
+.sheet{width:min(940px,94vw);max-height:86vh;display:flex;flex-direction:column;border:1px solid var(--line2);border-radius:16px;background:var(--panel2);overflow:hidden;box-shadow:0 40px 120px -30px #000}
+.dhead{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.dhead h3{margin:0;font-size:17px;font-weight:800}
+.dhead p{margin:2px 0 0;font-size:13px;color:var(--grey)}
+.tools{margin-left:auto;display:flex;gap:10px;position:relative}
+.btn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:700;color:var(--ink);background:#16181c;border:1px solid var(--line2);border-radius:9px;padding:9px 13px;cursor:pointer;transition:.16s}
+.btn:hover{border-color:var(--green);color:#fff}
+.btn.x{background:linear-gradient(180deg,#15391f,#0f2616);border-color:rgba(23,151,56,.5)}
+.btn.x:hover{box-shadow:0 0 22px -6px rgba(43,212,110,.6)}
+.close{width:34px;height:34px;border-radius:9px;border:1px solid var(--line2);background:#16181c;color:var(--grey);font-size:20px;line-height:1;cursor:pointer;transition:.16s}
+.close:hover{border-color:var(--red);color:#fff}
+.menu{position:absolute;right:0;top:46px;background:#101216;border:1px solid var(--line2);border-radius:10px;padding:8px;min-width:190px;display:none;z-index:5;box-shadow:0 20px 50px -20px #000}
+.menu.show{display:block}
+.menu label{display:flex;align-items:center;gap:9px;font-size:13px;color:#cfd3da;padding:7px 8px;border-radius:7px;cursor:pointer}
+.menu label:hover{background:#181a1f}
+.menu input{accent-color:var(--green)}
+.tbl-scroll{overflow-y:auto;overflow-x:hidden;flex:1}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th{position:sticky;top:0;background:#15171b;color:var(--grey);font-weight:700;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;user-select:none;transition:.15s}
+th:hover{color:var(--green2)}
+th .ar{opacity:.4;font-size:10px;margin-left:5px}
+th.sorted .ar{opacity:1;color:var(--green2)}
+td.num{font-variant-numeric:tabular-nums;color:#dfe3ea}
+tbody tr:hover{background:#141518}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700}
+.s-green{background:rgba(23,151,56,.16);color:#4fd07f}.s-gold{background:rgba(251,180,14,.15);color:#f2c14e}.s-red{background:rgba(237,25,21,.15);color:#ff6a66}.s-grey{background:rgba(129,129,150,.18);color:#aab}
+.foot{padding:13px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <span class="clip">CLIP</span><span class="pb">POWERED BY</span>
+      <div class="dotsh"><i style="background:var(--red)"></i><i style="background:var(--gold)"></i><i style="background:var(--green)"></i><i style="background:var(--blue)"></i><i style="background:var(--greyc)"></i></div>
+      <span class="cl">Construct Lore</span>
+    </div>
+    <div class="topright">
+      <span class="illus">Illustrative data only</span>
+      <button class="dl" id="dlBtn">&#11015; Download daily report</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active">Executive Brief</div>
+    <div class="tab locked">Schedule and Project Health <svg class="lk" width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></div>
+    <div class="tab locked">Issues Intelligence <svg class="lk" width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></div>
+    <div class="tab locked">Asset Intelligence <svg class="lk" width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></div>
+    <div class="tab locked">Live Energization Map <svg class="lk" width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></div>
+    <div class="tab locked">Accountability <svg class="lk" width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></div>
+    <div class="tab locked">Pipeline Stall <svg class="lk" width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg></div>
+  </div>
+  <div class="titlerow">
+    <h1><span class="shine">Executive Summary</span></h1>
+    <div class="filters">
+      <div class="filter"><label>Campus</label><div class="sel"><select id="campusSel"><option>Campus 1</option><option>Campus 2</option></select></div></div>
+      <div class="filter"><label>Project</label><div class="sel"><select id="projectSel"><option>Data Center 1</option><option>Data Center 2</option></select></div></div>
+      <div class="filter"><label>Space</label><div class="sel"><select id="spaceSel"><option>Data Hall 4</option><option>Data Hall 5</option><option>Data Hall 6</option><option>Data Hall 7</option><option>All Halls</option></select></div></div>
+      <div class="filter"><label>Asset</label><div class="sel"><select id="assetSel"><option>PDU</option><option>MSB</option><option>Generator</option><option>UDS</option><option>RPP</option><option>All Assets</option></select></div></div>
+      <div class="filter"><label>Vendor</label><div class="sel"><select id="vendorSel"><option>All Vendors</option><option>Vanta Electric</option><option>Meridian Power</option><option>Ironwood Controls</option><option>Northgate Mechanical</option><option>Apex Switchgear</option></select></div></div>
+      <div class="filter"><label>Priority</label><div class="sel"><select id="prioSel"><option>All Priorities</option><option>High</option><option>Med</option><option>Low</option></select></div></div>
+    </div>
+  </div>
+  <p class="ctx" id="ctx"></p>
+  <p class="narrative" id="narr"></p>
+  <p class="krisk" id="krisk"></p>
+  <div class="kpis" id="kpis"></div>
+  <div class="chart-panel">
+    <div class="cp-head">
+      <div><h3>Energization Production</h3><div class="sm" id="chartSub">Cumulative completion by commissioning level</div></div>
+      <div class="legend"><span><i style="background:var(--red)"></i>L1</span><span><i style="background:var(--gold)"></i>L2</span><span><i style="background:var(--green)"></i>L3</span></div>
+    </div>
+    <svg id="chart" viewBox="0 0 920 330" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Energization production curves"></svg>
+  </div>
+  <p class="hint">Pick any Space, Asset, Vendor, or Priority and the whole brief recomputes. Click any number, card, or figure to open the records behind it; in the popup, sort a column, tailor columns, or export to Excel.</p>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="dhead">
+      <div><h3 id="dTitle"></h3><p id="dNote"></p></div>
+      <div class="tools">
+        <button class="btn" id="colBtn">Columns &#9662;</button>
+        <div class="menu" id="colMenu"></div>
+        <button class="btn x" id="xlBtn">&#11015; Download Excel</button>
+      </div>
+      <button class="close" id="closeBtn" aria-label="Close">&times;</button>
+    </div>
+    <div class="tbl-scroll"><table id="tbl"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+    <div class="foot"><span id="rowCount"></span> &middot; sample figures for layout, swap in the live extract</div>
+  </div>
+</div>
+
+<script>
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+const ASSET={"PDU":{noun:"PDUs",pre:"PDU",sys:"PDU",base:21},"MSB":{noun:"MSBs",pre:"MSB",sys:"MSB",base:6},"Generator":{noun:"generators",pre:"GEN",sys:"Generator",base:4},"UDS":{noun:"UDS units",pre:"UDS",sys:"UDS",base:12},"RPP":{noun:"RPPs",pre:"RPP",sys:"RPP",base:24},"All Assets":{noun:"assets",pre:"AST",sys:"Mixed",base:67}};
+const SPACECODE={"Data Hall 4":"DH4","Data Hall 5":"DH5","Data Hall 6":"DH6","Data Hall 7":"DH7","All Halls":"DH"};
+const VENDORS=["Vanta Electric","Meridian Power","Ironwood Controls","Northgate Mechanical","Apex Switchgear"];
+const SHP={L1:[.42,.72,.89,.96,1,1,1,1],L2:[.10,.29,.49,.65,.79,.90,.97,1],L3:[.03,.12,.27,.45,.63,.79,.93,1]};
+const CHDATES=["Apr 15","Apr 29","May 6","May 13","May 20","May 27","Jun 3","Jun 10"];
+const BLOCKERS=["Torque verification","Megger pending","Breaker settings","Ground bond","IR scan","Label QA","Punch open"];
+const COURTS=["CxA","GC","Vendor"],EDATES=["May 26","May 28","Jun 01","Jun 03","Jun 05","Jun 07","Jun 09"];
+let DATA=null,cur=null,sortCol=null,sortDir=1,hidden={};
+
+function buildData(space,asset,vendor,priority,campus,project){
+  const ai=ASSET[asset]||ASSET["PDU"], sc=SPACECODE[space]||"DH4";
+  const rng=mulberry32(hashStr(space+"|"+asset+"|"+vendor+"|"+priority));
+  const ri=(a,b)=>Math.floor(rng()*(b-a+1))+a, rf=(a,b)=>rng()*(b-a)+a;
+  const allHalls=(space==="All Halls"), vendorSel=(vendor&&vendor!=="All Vendors")?vendor:null;
+  let total=ai.base+ri(-2,3); if(allHalls)total=ai.base*ri(3,4)+ri(-3,4); if(vendorSel)total=Math.round(total*rf(.3,.6)); if(total<3)total=3;
+  let energized=Math.round(total*ri(48,78)/100); if(energized>=total)energized=total-1; if(energized<1)energized=1;
+  let notE=total-energized;
+  let pending=notE>0?Math.max(1,Math.round(notE*rf(.45,.7))):0; if(pending>notE)pending=notE;
+  let ready=Math.max(0,notE-pending);
+  const ePct=Math.round(energized/total*100), L3=ePct;
+  let notL2=Math.min(ready,ri(1,2)), l2c=energized+pending+Math.max(0,ready-notL2);
+  let L2=Math.min(97,Math.round(l2c/total*100)); if(L2<=L3)L2=Math.min(97,L3+ri(8,16));
+  const rate=rf(4,12), req=rate+rf(2.5,5), behind=req-rate;
+  const pool={High:(pending>0?pending*ri(1,2)+ri(0,2):ri(0,2)),Med:(pending>0?pending*ri(1,3)+ri(1,4):ri(0,3)),Low:(pending>0?pending*ri(2,4)+ri(2,6):ri(1,5))};
+  const pSel=(priority&&priority!=="All Priorities")?priority:"High";
+  const issN=pool[pSel], issTone=(pSel==="High"?"red":pSel==="Med"?"gold":"grey"), issLabel=pSel+"-Priority Issues";
+  const ownerOf=()=>vendorSel?vendorSel:VENDORS[ri(0,VENDORS.length-1)];
+  const hallLbl=h=>h.replace("DH","Data Hall ");
+  const hf=()=>allHalls?("DH"+ri(4,7)):sc;
+  const aid=()=>{const h=hf(),cell=ri(1,12);return [h+"-C"+cell+"-"+ai.pre+String(ri(1,8)).padStart(2,'0'),hallLbl(h),"Cell "+cell];};
+  const cap=n=>Math.min(n,46);
+  let er=[];for(let i=0;i<cap(energized);i++){const a=aid();er.push([a[0],a[1],a[2],ai.sys,rng()<.5?"L4":"L5",["Energized","green"],EDATES[ri(0,EDATES.length-1)]]);}
+  let rr=[];for(let i=0;i<cap(ready);i++){const a=aid();rr.push([a[0],a[1],a[2],["Complete","green"],["0","green"],["Staged","gold"]]);}
+  let pr=[];for(let i=0;i<cap(pending);i++){const a=aid();const iss=ri(1,6);const pc=rng()<.5?["High","red"]:(rng()<.6?["Med","gold"]:["Low","grey"]);pr.push([a[0],a[1],a[2],["Complete","green"],[String(iss),iss>=4?"red":"gold"],BLOCKERS[ri(0,BLOCKERS.length-1)],pc]);}
+  let qr=[];for(let i=0;i<cap(issN);i++){const a=aid();qr.push(["IS-"+ri(2200,2480),a[0],COURTS[ri(0,2)],ownerOf(),String(ri(1,9)),[pSel,issTone],rng()<.6?["Open","red"]:["Submitted","gold"]]);}
+  const reqS=req.toFixed(1);let tr=[];const rdays=["Jun 03","Jun 04","Jun 05","Jun 06","Jun 07","Jun 08"];
+  for(let d=0;d<6;d++){const comp=Math.max(0,Math.round(rate+rf(-2,2)));const v=comp-req;tr.push([rdays[d],[String(comp),comp>=req?"green":(v<-3?"red":"gold")],reqS,[v.toFixed(1),v<-3?"red":"gold"],[v>=0?"up":(v<-3?"down":"flat"),v>=0?"green":(v<-3?"red":"grey")]]);}
+  tr.push(["7-day avg",[rate.toFixed(1),"gold"],reqS,[(-behind).toFixed(1),"red"],["behind","red"]]);
+  const noun=ai.noun, Noun=noun.charAt(0).toUpperCase()+noun.slice(1);
+  const kpis={
+    energized:{lab:"Assets Energized",val:ePct+"%",sub:"<b>"+energized+"</b> / "+total+" "+noun,title:Noun+" Energized",note:Noun+" that have cleared the energization gate and are live.",cols:["Asset ID","Data Hall","Cell","System","Level","Status","Energized"],rows:er},
+    ready:{lab:"Ready to Energize",val:String(ready),sub:"no open issues &middot; L2 complete",title:"Ready to Energize — no open issues",note:Noun+" that have cleared every issue and finished L2, staged and waiting only on the energization gate.",cols:["Asset ID","Data Hall","Cell","L2","Open Issues","Gate"],rows:rr},
+    pending:{lab:"Pending Energization",val:String(pending),sub:"blocked by ~1 open issue &middot; L2 complete",title:"Pending Energization — issues open",note:Noun+" that finished L2 but cannot energize until their gating open issue is resolved and verified.",cols:["Asset ID","Data Hall","Cell","L2","Open Issues","Top Blocker","Priority"],rows:pr},
+    priority:{lab:issLabel,val:String(issN),tone:issTone,alert:(pSel==="High"),sub:"open"+(vendorSel?" &middot; "+vendorSel:"")+", in the energization gate",title:issLabel.replace("Issues","Open Issues"),note:pSel+"-priority open issues that gate energization"+(vendorSel?", owned by "+vendorSel:"")+".",cols:["Issue ID","Asset","Court","Owner","Age (d)","Priority","Status"],rows:qr},
+    rate:{lab:"L3 Checklist Production",val:rate.toFixed(1)+"/d",sub:"<b class='warn'>−"+behind.toFixed(1)+"/day</b> vs. scheduled L3 pace",title:"L3 Checklist Production vs Scheduled Pace",note:"Daily L3 checklist completions against the rate required to hit the scheduled L3 date. Negative variance means the area is falling behind.",cols:["Date","L3 Completions","Required / day","Variance","Trend"],rows:tr}
+  };
+  const prioWord=pSel.toLowerCase();
+  const narr='Across '+space+(vendorSel?", "+vendorSel+"’s scope":'')+', <span class="callout" data-kpi="energized">'+ePct+'% of '+noun+' are energized</span>. '
+    +'<span class="callout" data-kpi="ready">'+ready+(ready===1?' is':' are')+' staged and clear</span>, while '
+    +'<span class="callout" data-kpi="pending">'+pending+(pending===1?' remains':' remain')+' pending</span> on at least one open issue. '
+    +'<span class="callout hot" data-kpi="priority"><span class="n">'+issN+'</span> '+prioWord+'&#8209;priority issue'+(issN===1?'':'s')+'</span> sit in the energization gate, '
+    +'and checklist throughput is running <span class="callout hot" data-kpi="rate"><span class="n">'+behind.toFixed(1)+'</span> per day behind</span> the scheduled L3 date.';
+  const ctx=(campus?campus+' &middot; ':'')+(project?project+' &middot; ':'')+space+' &middot; '+noun+(vendorSel?' &middot; '+vendorSel:'')+(priority&&priority!=="All Priorities"?' &middot; '+pSel+' priority':'')+' &middot; live record <span style="color:var(--soft)">(refreshed 7:45am MST)</span>';
+  const riskVendor=vendorSel||VENDORS[ri(0,VENDORS.length-1)], topBlocker=BLOCKERS[ri(0,BLOCKERS.length-1)].toLowerCase();
+  const sing=noun.endsWith(' units')?noun.replace(/ units$/,' unit'):noun.replace(/s$/,'');
+  const risk='<b>Key risk:</b> '+pending+' '+(pending===1?sing:noun)+' '+(pending===1?'sits':'sit')+' one verification short of energizing, and at '+behind.toFixed(1)+'/day behind the L3 pace, '+riskVendor+'’s '+topBlocker+' backlog is the gate deciding the '+space+' energization date.';
+  const chart={L1:SHP.L1.map(s=>Math.round(100*s)),L2:SHP.L2.map(s=>Math.round(L2*s)),L3:SHP.L3.map(s=>Math.round(L3*s))};
+  return {kpis:kpis,narr:narr,ctx:ctx,chart:chart,noun:noun,risk:risk};
+}
+
+function cellHtml(v){if(Array.isArray(v))return '<td><span class="pill '+({green:"s-green",gold:"s-gold",red:"s-red",grey:"s-grey"}[v[1]]||'s-grey')+'">'+v[0]+'</span></td>';if(/^[−\-\d.,%/]+$/.test(String(v))||/^\d+\/\d+$/.test(String(v)))return '<td class="num">'+v+'</td>';return '<td>'+v+'</td>';}
+function sortVal(v){if(Array.isArray(v))v=v[0];const n=parseFloat(String(v).replace(/[^\d.\-]/g,''));return isNaN(n)?String(v).toLowerCase():n;}
+function render(){
+  const k=DATA.kpis[cur];
+  document.getElementById('dTitle').textContent=k.title;
+  document.getElementById('dNote').textContent=k.note;
+  const vis=k.cols.map((c,i)=>({c:c,i:i})).filter(o=>!hidden[cur+'|'+o.i]);
+  let th='<tr>';vis.forEach(o=>{const ar=sortCol===o.i?(sortDir>0?'▲':'▼'):'▵';th+='<th class="'+(sortCol===o.i?'sorted':'')+'" data-i="'+o.i+'">'+o.c+'<span class="ar">'+ar+'</span></th>';});th+='</tr>';
+  document.getElementById('thead').innerHTML=th;
+  let rows=k.rows.slice();
+  if(sortCol!==null){rows.sort((a,b)=>{const x=sortVal(a[sortCol]),y=sortVal(b[sortCol]);return (x<y?-1:x>y?1:0)*sortDir;});}
+  let body='';rows.forEach(r=>{body+='<tr>';vis.forEach(o=>{body+=cellHtml(r[o.i]);});body+='</tr>';});
+  document.getElementById('tbody').innerHTML=body;
+  document.getElementById('rowCount').textContent=rows.length+' rows';
+  document.querySelectorAll('#thead th').forEach(t=>t.onclick=()=>{const i=+t.dataset.i;if(sortCol===i)sortDir*=-1;else{sortCol=i;sortDir=1;}render();});
+  const menu=document.getElementById('colMenu');
+  menu.innerHTML=k.cols.map((c,i)=>'<label><input type="checkbox" data-i="'+i+'" '+(hidden[cur+'|'+i]?'':'checked')+'> '+c+'</label>').join('');
+  menu.querySelectorAll('input').forEach(inp=>inp.onchange=()=>{hidden[cur+'|'+inp.dataset.i]=!inp.checked;render();});
+}
+function openKpi(key){if(!DATA.kpis[key])return;cur=key;sortCol=null;sortDir=1;render();document.getElementById('modal').classList.add('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.getElementById('colMenu').classList.remove('show');}
+function doExport(){const key=cur||'energized';const k=DATA.kpis[key];const vis=k.cols.map((c,i)=>({c:c,i:i})).filter(o=>!hidden[key+'|'+o.i]);const head=vis.map(o=>o.c);const data=k.rows.map(r=>vis.map(o=>Array.isArray(r[o.i])?r[o.i][0]:r[o.i]));const fname='CLIP_'+key+'.xlsx';if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head].concat(data));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'CLIP');XLSX.writeFile(wb,fname);}else{const csv=[head].concat(data).map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fname.replace('.xlsx','.csv');a.click();}}
+function renderChart(ch){
+  const W=920,H=330,pl=46,pr=70,pt=20,pb=40,x0=pl,x1=W-pr,yb=H-pb,yt=pt;
+  const S=[{n:"L1",c:"#ED1915",d:ch.L1},{n:"L2",c:"#FBB40E",d:ch.L2},{n:"L3",c:"#179738",d:ch.L3}];
+  const N=CHDATES.length,X=i=>x0+(x1-x0)*i/(N-1),Y=v=>yb+(yt-yb)*(v/100);
+  let g='<defs>'+S.map((s,si)=>'<linearGradient id="g'+si+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+s.c+'" stop-opacity="0.55"/><stop offset="1" stop-color="'+s.c+'" stop-opacity="0"/></linearGradient>').join('')+'</defs>';
+  for(let v=0;v<=100;v+=25){const yy=Y(v);g+='<line x1="'+x0+'" y1="'+yy+'" x2="'+x1+'" y2="'+yy+'" stroke="#1d1e23"/>';g+='<text x="'+(x0-9)+'" y="'+(yy+4)+'" fill="#6b6f78" font-size="11" text-anchor="end">'+v+'%</text>';}
+  CHDATES.forEach((d,i)=>{g+='<text x="'+X(i)+'" y="'+(yb+22)+'" fill="#6b6f78" font-size="10.5" text-anchor="middle">'+d+'</text>';});
+  S.forEach((s,si)=>{const pts=s.d.map((v,i)=>X(i)+','+Y(v)).join(' ');const area='M '+X(0)+' '+yb+' L '+s.d.map((v,i)=>X(i)+' '+Y(v)).join(' L ')+' L '+X(N-1)+' '+yb+' Z';g+='<path d="'+area+'" fill="url(#g'+si+')" opacity="0.5"/>';g+='<polyline class="cline" points="'+pts+'" fill="none" stroke="'+s.c+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>';const lx=X(N-1),ly=Y(s.d[N-1]);g+='<circle cx="'+lx+'" cy="'+ly+'" r="4" fill="'+s.c+'"/>';g+='<text x="'+(lx+9)+'" y="'+(ly+4)+'" fill="'+s.c+'" font-size="12.5" font-weight="800">'+s.n+' '+s.d[N-1]+'%</text>';});
+  document.getElementById('chart').innerHTML=g;
+}
+function renderKpis(){const grid=document.getElementById('kpis');grid.innerHTML='';Object.entries(DATA.kpis).forEach(function(e){const key=e[0],k=e[1];const el=document.createElement('div');el.className='kpi'+(k.alert?' alert':'');el.dataset.kpi=key;el.innerHTML='<div class="lab">'+k.lab+'</div><div class="val '+(k.tone||'')+'">'+k.val+'</div><div class="sub">'+k.sub+'</div><div class="open">open →</div>';el.onclick=function(){openKpi(key);};grid.appendChild(el);});}
+function bindCallouts(){document.querySelectorAll('.callout').forEach(function(c){c.onclick=function(){openKpi(c.dataset.kpi);};});}
+function apply(){
+  const space=document.getElementById('spaceSel').value, asset=document.getElementById('assetSel').value, vendor=document.getElementById('vendorSel').value, priority=document.getElementById('prioSel').value;
+  const campus=document.getElementById('campusSel').value, project=document.getElementById('projectSel').value;
+  DATA=buildData(space,asset,vendor,priority,campus,project);
+  document.getElementById('ctx').innerHTML=DATA.ctx;
+  document.getElementById('narr').innerHTML=DATA.narr;
+  document.getElementById('krisk').innerHTML=DATA.risk;
+  bindCallouts();
+  renderKpis();
+  document.getElementById('chart').innerHTML='';
+  renderChart(DATA.chart);
+  document.getElementById('chartSub').textContent='Cumulative completion by commissioning level, '+space+' '+DATA.noun;
+  if(document.getElementById('modal').classList.contains('open')&&DATA.kpis[cur])render();
+}
+document.getElementById('campusSel').onchange=apply;
+document.getElementById('projectSel').onchange=apply;
+document.getElementById('spaceSel').onchange=apply;
+document.getElementById('assetSel').onchange=apply;
+docume

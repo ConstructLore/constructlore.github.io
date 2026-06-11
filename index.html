@@ -752,8 +752,10 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
             p.vx+=(tvx-p.vx)*REL;p.vy+=(tvy-p.vy)*REL;
             p.x+=p.vx;p.y+=p.vy;
             if(p.grab<0.02){
-              if(p.x<-12)p.x=W+12;else if(p.x>W+12)p.x=-12;
-              if(p.y<-12)p.y=H+12;else if(p.y>H+12)p.y=-12;
+              if(p.x<-6){p.x=-6;p.vx=Math.abs(p.vx);p.dirx=Math.abs(p.dirx);}
+              else if(p.x>W+6){p.x=W+6;p.vx=-Math.abs(p.vx);p.dirx=-Math.abs(p.dirx);}
+              if(p.y<-6){p.y=-6;p.vy=Math.abs(p.vy);p.diry=Math.abs(p.diry);}
+              else if(p.y>H+6){p.y=H+6;p.vy=-Math.abs(p.vy);p.diry=-Math.abs(p.diry);}
             }
             var edge=Math.min(1,(p.x+12)/70,(W+12-p.x)/70,(p.y+12)/70,(H+12-p.y)/70);
             p.ea=edge>0?edge:0;

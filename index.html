@@ -244,7 +244,7 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
    ============================================================ */
 
 /* ambient drift canvas: a whisper of motes behind the page */
-#ambient{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+#ambient{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;background:radial-gradient(125% 95% at 50% 38%,#16191F 0%,#0E1116 42%,#07080B 100%)}
 
 /* hero: a faint breathing glow behind the words */
 .heroaura{position:absolute;left:50%;top:42%;width:min(900px,92vw);height:520px;transform:translate(-50%,-50%);z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(23,151,56,.10),rgba(23,151,56,.03) 45%,transparent 70%);filter:blur(8px);opacity:0;animation:auraIn 1.8s ease .3s forwards}
@@ -330,7 +330,7 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
 <section class="hero" id="top" style="border-top:none">
   <div class="heroaura" aria-hidden="true"></div>
   <div class="wrap">
-    <div class="kicker"><span class="dot" style="background:var(--gold)"></span>First-of-kind intelligence platform for data center delivery</div>
+    <div class="kicker"><span class="dot" style="background:var(--gold)"></span>THE INTELLIGENCE PLATFORM FOR DATA CENTER DELIVERY</div>
     <h1>The Data Already Knows.<br><span class="listen">We Help You Listen.</span></h1>
     <p class="sub">CLIP&trade;, the Construct Lore&trade; Intelligence Platform, reads the record your data center project already produces and returns <b>decision-ready intelligence</b>: what blocks energization, which issues matter most, and what leadership acts on today. <b style="display:block;margin-top:12px">Built to grow with your team, your portfolio, and your organization.</b></p>
     <div class="ctarow">
@@ -642,103 +642,97 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
     requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList.add('lit');});});
   }
 
-  // ambient network: motes drift as before, but now they briefly link as they pass,
-  // and once in a while a few of them gather into a loose pattern, hold, and let go.
+  // ambient constellation: a faint grey-white network drifts and breathes across a
+  // deep charcoal field. now and then a few nodes resolve into a green cluster,
+  // link up, glow with a soft halo, and dissolve back into the noise.
   try{
     var cv=document.getElementById('ambient');
     if(cv&&!reduce&&cv.getContext){
       var ctx=cv.getContext('2d');
       if(ctx){
         var dpr=Math.min(window.devicePixelRatio||1,2);
-        var W=0,H=0,parts=[],running=false,raf=0,t=0;
+        var W=0,H=0,CX=0,CY=0,parts=[],running=false,raf=0,t=0;
+
+        var NODE='225,229,236';   // grey-white nodes
+        var EDGE='150,162,184';   // cool grey-blue edges
+        var GREEN='23,151,56';    // #179738, the only accent
 
         var sprite=function(rgb){
-          var s=document.createElement('canvas'),d=24;s.width=s.height=d;
+          var s=document.createElement('canvas'),d=64;s.width=s.height=d;
           var c=s.getContext('2d'),g=c.createRadialGradient(d/2,d/2,0,d/2,d/2,d/2);
-          g.addColorStop(0,'rgba('+rgb+',1)');g.addColorStop(1,'rgba('+rgb+',0)');
+          g.addColorStop(0,'rgba('+rgb+',1)');
+          g.addColorStop(0.5,'rgba('+rgb+',0.32)');
+          g.addColorStop(1,'rgba('+rgb+',0)');
           c.fillStyle=g;c.fillRect(0,0,d,d);return s;
         };
-        var spGreen=sprite('23,151,56'),spGrey=sprite('129,129,150');
-        var LGREY='rgb(129,129,150)',LGREEN='rgb(23,151,56)';
+        var glowGreen=sprite(GREEN);
 
-        // tuning: connect radius scales gently with viewport, grid cell matches it
-        var LINK=130,LINK2=LINK*LINK,CELL=LINK,MARGIN=90,SEP2=0;
-        var REL=0.02;    // velocity always eases back to its own drift, so nothing runs away
-        var SPR=0.0006;  // cluster spring toward the shared center, very soft
-        var MAXC=2;      // at most two patterns alive at once
+        var LINK=150,LINK2=LINK*LINK,CELL=LINK,MARGIN=90,SEP2=0;
+        var REL=0.015;    // velocity eases back to its slow drift
+        var SPR=0.0007;   // green cluster spring, very soft
+        var MAXC=2;       // at most two green moments at once
 
         var clusters=[],clid=0,cool=0,lastCX=-1,lastCY=-1;
         var smooth=function(x){if(x<0)x=0;else if(x>1)x=1;return x*x*(3-2*x);};
 
         var seed=function(){
-          var n=Math.max(14,Math.min(34,Math.round(W/52)));
+          var n=Math.max(18,Math.min(44,Math.round(W/44)));
           parts=[];
           for(var i=0;i<n;i++){
-            var ph=Math.random()*Math.PI*2,s=0.05+Math.random()*0.14;
+            var dir=Math.random()*Math.PI*2,sp=0.012+Math.random()*0.03;
             parts.push({
-              x:Math.random()*W,y:Math.random()*H,
-              r:0.8+Math.random()*1.6,
-              s:s,ph:ph,
-              vx:Math.sin(t+ph)*0.12,vy:-s,
-              a:0.07+Math.random()*0.08,
-              green:Math.random()<0.45,
+              x:Math.random()*W,y:Math.random()*H,bx:0,by:0,
+              r:0.7+Math.random()*1.5,
+              a:0.36+Math.random()*0.18,
+              ph:Math.random()*Math.PI*2,
+              tw:0.6+Math.random()*0.8,
+              vx:Math.cos(dir)*sp,vy:Math.sin(dir)*sp,
+              dirx:Math.cos(dir)*sp,diry:Math.sin(dir)*sp,
               cl:0,grab:0,ea:0
             });
           }
-          clusters=[];clid=0;cool=200+Math.random()*240;lastCX=-1;lastCY=-1;
+          clusters=[];clid=0;cool=240+Math.random()*300;lastCX=-1;lastCY=-1;
         };
 
-        // spatial grid: cells sized to the connect radius, so pair tests stay cheap
         var gw=1,gh=1,grid=[];
         var sizeGrid=function(){
           gw=Math.max(1,Math.ceil(W/CELL));gh=Math.max(1,Math.ceil(H/CELL));
-          grid=[];
-          for(var i=0;i<gw*gh;i++){grid.push([]);}
+          grid=[];for(var i=0;i<gw*gh;i++){grid.push([]);}
         };
 
         var size=function(){
-          W=window.innerWidth;H=window.innerHeight;
+          W=window.innerWidth;H=window.innerHeight;CX=W/2;CY=H/2;
           cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
           ctx.setTransform(dpr,0,0,dpr,0,0);
-          LINK=Math.max(90,Math.min(150,W*0.11));
-          LINK2=LINK*LINK;CELL=LINK;MARGIN=Math.max(70,LINK*0.7);
-          var sep=Math.min(W,H)*0.35;SEP2=sep*sep;
-          sizeGrid();
-          seed();
+          LINK=Math.max(128,Math.min(196,W*0.14));
+          LINK2=LINK*LINK;CELL=LINK;MARGIN=Math.max(80,LINK*0.6);
+          var sep=Math.min(W,H)*0.4;SEP2=sep*sep;
+          sizeGrid();seed();
         };
 
-        // start a new pattern: a mote with enough close neighbors, away from the
-        // edges and away from where the last pattern lived
         var trySpawn=function(){
           var n=parts.length;
           for(var att=0;att<6;att++){
             var i=(Math.random()*n)|0,p=parts[i];
             if(p.cl)continue;
             if(p.x<MARGIN||p.x>W-MARGIN||p.y<MARGIN||p.y>H-MARGIN)continue;
-            if(lastCX>=0){
-              var lx=p.x-lastCX,ly=p.y-lastCY;
-              if(lx*lx+ly*ly<SEP2)continue;
-            }
-            var near=[],grab2=LINK2*0.9,j,dx,dy,d2;
+            if(lastCX>=0){var lx=p.x-lastCX,ly=p.y-lastCY;if(lx*lx+ly*ly<SEP2)continue;}
+            var near=[],grab2=LINK2*0.85,j,dx,dy,d2;
             for(j=0;j<n;j++){
               if(j===i||parts[j].cl)continue;
               dx=parts[j].x-p.x;dy=parts[j].y-p.y;d2=dx*dx+dy*dy;
               if(d2<grab2){near.push({j:j,d:d2});}
             }
-            if(near.length<3)continue;
+            if(near.length<2)continue;
             near.sort(function(a,b){return a.d-b.d;});
-            var m=[i],take=Math.min(near.length,3+((Math.random()*3)|0)),k;
+            var m=[i],take=Math.min(near.length,2+((Math.random()*3)|0)),k;
             for(k=0;k<take;k++){m.push(near[k].j);}
-            var sx=0,sy=0;
-            for(k=0;k<m.length;k++){sx+=parts[m[k]].x;sy+=parts[m[k]].y;}
+            var sx=0,sy=0;for(k=0;k<m.length;k++){sx+=parts[m[k]].x;sy+=parts[m[k]].y;}
             var mx=sx/m.length,my=sy/m.length,ox=[],oy=[];
-            for(k=0;k<m.length;k++){
-              ox.push((parts[m[k]].x-mx)*0.42); // settle into a loose shape, not a knot
-              oy.push((parts[m[k]].y-my)*0.42);
-            }
+            for(k=0;k<m.length;k++){ox.push((parts[m[k]].x-mx)*0.5);oy.push((parts[m[k]].y-my)*0.5);}
             clid++;
             for(k=0;k<m.length;k++){parts[m[k]].cl=clid;}
-            clusters.push({m:m,ox:ox,oy:oy,age:0,tin:90,hold:120+Math.random()*100,tout:120,rel:false});
+            clusters.push({m:m,ox:ox,oy:oy,age:0,tin:130,hold:150+Math.random()*120,tout:160,cx:mx,cy:my,rad:0,e:0});
             lastCX=mx;lastCY=my;
             return true;
           }
@@ -747,7 +741,7 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
 
         var stepClusters=function(){
           if(cool>0){cool--;}
-          else if(clusters.length<MAXC){cool=trySpawn()?(300+Math.random()*360):90;}
+          else if(clusters.length<MAXC){cool=trySpawn()?(900+Math.random()*700):120;}
           for(var ci=clusters.length-1;ci>=0;ci--){
             var c=clusters[ci],k,mp,u=++c.age,e;
             if(u<c.tin){e=smooth(u/c.tin);}
@@ -757,23 +751,16 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
             if(e<0){
               for(k=0;k<c.m.length;k++){mp=parts[c.m[k]];mp.cl=0;mp.grab=0;}
               clusters.splice(ci,1);
-              var cd=240+Math.random()*240;if(cool<cd)cool=cd; // breathe before the next one
+              var cd=600+Math.random()*500;if(cool<cd)cool=cd;
               continue;
             }
-            var sx=0,sy=0;
-            for(k=0;k<c.m.length;k++){sx+=parts[c.m[k]].x;sy+=parts[c.m[k]].y;}
-            var mx=sx/c.m.length,my=sy/c.m.length;
-            if(!c.rel&&u>=c.tin+c.hold){
-              c.rel=true; // the hold ends: one tiny outward sigh so the group truly parts
-              for(k=0;k<c.m.length;k++){
-                mp=parts[c.m[k]];
-                var rx=mp.x-mx,ry=mp.y-my,rd=Math.sqrt(rx*rx+ry*ry);
-                if(rd>1){mp.vx+=rx/rd*0.06;mp.vy+=ry/rd*0.06;}
-              }
-            }
+            c.e=e;
+            var sx=0,sy=0;for(k=0;k<c.m.length;k++){sx+=parts[c.m[k]].x;sy+=parts[c.m[k]].y;}
+            var mx=sx/c.m.length,my=sy/c.m.length;c.cx=mx;c.cy=my;
+            var rad=0;for(k=0;k<c.m.length;k++){var ddx=parts[c.m[k]].x-mx,ddy=parts[c.m[k]].y-my,dd=Math.sqrt(ddx*ddx+ddy*ddy);if(dd>rad)rad=dd;}
+            c.rad=rad;
             for(k=0;k<c.m.length;k++){
-              mp=parts[c.m[k]];
-              mp.grab=e;
+              mp=parts[c.m[k]];mp.grab=e;
               mp.vx+=(mx+c.ox[k]-mp.x)*SPR*e;
               mp.vy+=(my+c.oy[k]-mp.y)*SPR*e;
             }
@@ -781,34 +768,37 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
         };
 
         var move=function(){
+          var br=1+0.018*Math.sin(t*1.6);
           for(var i=0;i<parts.length;i++){
             var p=parts[i];
-            var tvx=Math.sin(t+p.ph)*0.12;                  // the old sway, as a target velocity
-            var tvy=-p.s+Math.cos(t*0.8+p.ph*1.7)*0.03;     // slow rise with a faint wander
-            p.vx+=(tvx-p.vx)*REL;
-            p.vy+=(tvy-p.vy)*REL;
+            var tvx=p.dirx+Math.sin(t*0.5+p.ph)*0.05;
+            var tvy=p.diry+Math.cos(t*0.4+p.ph*1.3)*0.05;
+            p.vx+=(tvx-p.vx)*REL;p.vy+=(tvy-p.vy)*REL;
             p.x+=p.vx;p.y+=p.vy;
-            if(p.grab<0.02){ // gathered motes skip recycling so a pattern never snaps
-              if(p.y<-10){p.y=H+10;p.x=Math.random()*W;}
-              if(p.x<-10){p.x=W+10;}else if(p.x>W+10){p.x=-10;}
+            if(p.grab<0.02){
+              if(p.x<-12)p.x=W+12;else if(p.x>W+12)p.x=-12;
+              if(p.y<-12)p.y=H+12;else if(p.y>H+12)p.y=-12;
             }
-            var edge=Math.min(1,(p.y+10)/90,(H+10-p.y)/90);
+            var edge=Math.min(1,(p.x+12)/70,(W+12-p.x)/70,(p.y+12)/70,(H+12-p.y)/70);
             p.ea=edge>0?edge:0;
+            p.bx=CX+(p.x-CX)*br;p.by=CY+(p.y-CY)*br;
           }
         };
 
         var line=function(p,q){
           var dx=q.x-p.x,dy=q.y-p.y,d2=dx*dx+dy*dy;
           if(d2>=LINK2)return;
-          var ss=smooth(1-Math.sqrt(d2)/LINK); // breathes in on approach, out on parting
-          var bond=(p.cl&&p.cl===q.cl)?(p.grab<q.grab?p.grab:q.grab):0;
-          var a=ss*(0.075+0.062*bond)*(p.ea<q.ea?p.ea:q.ea);
-          var gp=p.green&&q.green; // green only when both ends are green, so it stays rare
-          if(gp)a*=0.85;
-          if(a<0.005)return;
-          ctx.globalAlpha=a;
-          ctx.strokeStyle=gp?LGREEN:LGREY;
-          ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+          var ss=smooth(1-Math.sqrt(d2)/LINK),ea=p.ea<q.ea?p.ea:q.ea;
+          if(p.cl&&p.cl===q.cl){
+            var g=p.grab<q.grab?p.grab:q.grab,ga=ss*0.45*g*ea;
+            if(ga<0.004)return;
+            ctx.globalAlpha=ga;ctx.strokeStyle='rgb('+GREEN+')';
+          }else{
+            var a=ss*0.19*ea;
+            if(a<0.004)return;
+            ctx.globalAlpha=a;ctx.strokeStyle='rgb('+EDGE+')';
+          }
+          ctx.beginPath();ctx.moveTo(p.bx,p.by);ctx.lineTo(q.bx,q.by);ctx.stroke();
         };
 
         var links=function(){
@@ -823,12 +813,10 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
           ctx.lineWidth=1;
           for(var gy=0;gy<gh;gy++){
             for(var gx=0;gx<gw;gx++){
-              var b=grid[gy*gw+gx];
-              if(!b.length)continue;
+              var b=grid[gy*gw+gx];if(!b.length)continue;
               for(var a=0;a<b.length;a++){
                 var pa=parts[b[a]],c,o;
                 for(c=a+1;c<b.length;c++){line(pa,parts[b[c]]);}
-                // forward neighbor cells only, so each pair is tested exactly once
                 if(gx+1<gw){o=grid[gy*gw+gx+1];for(c=0;c<o.length;c++){line(pa,parts[o[c]]);}}
                 if(gy+1<gh){
                   o=grid[(gy+1)*gw+gx];for(c=0;c<o.length;c++){line(pa,parts[o[c]]);}
@@ -840,21 +828,44 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
           }
         };
 
+        var halos=function(){
+          ctx.globalCompositeOperation='lighter';
+          for(var ci=0;ci<clusters.length;ci++){
+            var c=clusters[ci];if(!c.e)continue;
+            var R=(c.rad+85)*1.5;
+            ctx.globalAlpha=0.14*c.e;
+            ctx.drawImage(glowGreen,c.cx-R,c.cy-R,R*2,R*2);
+          }
+          ctx.globalCompositeOperation='source-over';
+        };
+
         var dots=function(){
           for(var i=0;i<parts.length;i++){
-            var p=parts[i];
-            ctx.globalAlpha=p.a*p.ea*(0.85+0.2*Math.sin(t*2+p.ph))*(1+0.22*p.grab);
-            var sz=p.r*8;
-            ctx.drawImage(p.green?spGreen:spGrey,p.x-sz/2,p.y-sz/2,sz,sz);
+            var p=parts[i],g=p.grab;
+            var tw=0.82+0.18*Math.sin(t*p.tw*3+p.ph);
+            ctx.globalAlpha=p.a*p.ea*tw*(1-0.55*g);
+            ctx.fillStyle='rgb('+NODE+')';
+            ctx.beginPath();ctx.arc(p.bx,p.by,p.r,0,6.283);ctx.fill();
+            if(g>0.01){
+              ctx.globalCompositeOperation='lighter';
+              ctx.globalAlpha=Math.min(1,p.a*p.ea*tw)*g;
+              ctx.fillStyle='rgb('+GREEN+')';
+              ctx.beginPath();ctx.arc(p.bx,p.by,p.r+0.6,0,6.283);ctx.fill();
+              var gs=(p.r+5)*4;
+              ctx.globalAlpha=0.32*g;
+              ctx.drawImage(glowGreen,p.bx-gs/2,p.by-gs/2,gs,gs);
+              ctx.globalCompositeOperation='source-over';
+            }
           }
         };
 
         var frame=function(){
           if(!running)return;
-          t+=0.004;
+          t+=0.0032;
           ctx.clearRect(0,0,W,H);
           stepClusters();
           move();
+          halos();
           links();
           dots();
           ctx.globalAlpha=1;

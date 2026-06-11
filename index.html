@@ -42,7 +42,7 @@ a{color:var(--txt);text-decoration:none}
 
 /* hero */
 .hero{padding:110px 0 84px;position:relative;overflow:hidden}
-.hero:before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px, #1A1A1E 1px, transparent 0);background-size:34px 34px;opacity:.5;mask-image:linear-gradient(180deg,#000 0%,transparent 78%)}
+.hero:before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px, #1A1A1A 1px, transparent 0);background-size:34px 34px;opacity:.5;mask-image:linear-gradient(180deg,#000 0%,transparent 78%)}
 .hero .wrap{position:relative}
 .kicker{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--mut);font-weight:700;margin-bottom:26px}
 .kicker .dot{width:8px;height:8px;border-radius:50%;flex:none}
@@ -244,7 +244,7 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
    ============================================================ */
 
 /* ambient drift canvas: a whisper of motes behind the page */
-#ambient{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;background:radial-gradient(125% 95% at 50% 38%,#16191F 0%,#0E1116 42%,#07080B 100%)}
+#ambient{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;background:radial-gradient(125% 95% at 50% 38%,#111111 0%,#0A0A0A 42%,#040404 100%)}
 
 /* hero: a faint breathing glow behind the words */
 .heroaura{position:absolute;left:50%;top:42%;width:min(900px,92vw);height:520px;transform:translate(-50%,-50%);z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(23,151,56,.10),rgba(23,151,56,.03) 45%,transparent 70%);filter:blur(8px);opacity:0;animation:auraIn 1.8s ease .3s forwards}
@@ -330,8 +330,9 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
 <section class="hero" id="top" style="border-top:none">
   <div class="heroaura" aria-hidden="true"></div>
   <div class="wrap">
-    <div class="kicker"><span class="dot" style="background:var(--gold)"></span>THE INTELLIGENCE PLATFORM FOR DATA CENTER DELIVERY</div>
-    <h1>The Data Already Knows.<br><span class="listen">We Help You Listen.</span></h1>
+    <div class="kicker"><span class="dot" style="background:var(--gold)"></span>Data Center Delivery Intelligence</div>
+    <h1>The Intelligence Platform for <span class="listen">Data Center Delivery</span></h1>
+    <p class="sub" style="font-size:23px;margin-top:22px"><b>The Data Already Knows.</b> <span style="color:var(--grey)">We Help You Listen.</span></p>
     <p class="sub">CLIP&trade;, the Construct Lore&trade; Intelligence Platform, reads the record your data center project already produces and returns <b>decision-ready intelligence</b>: what blocks energization, which issues matter most, and what leadership acts on today. <b style="display:block;margin-top:12px">Built to grow with your team, your portfolio, and your organization.</b></p>
     <div class="ctarow">
       <a class="cta" href="#quote">See CLIP on your project</a>
@@ -653,8 +654,8 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
         var dpr=Math.min(window.devicePixelRatio||1,2);
         var W=0,H=0,CX=0,CY=0,parts=[],running=false,raf=0,t=0;
 
-        var NODE='225,229,236';   // grey-white nodes
-        var EDGE='150,162,184';   // cool grey-blue edges
+        var NODE='228,228,228';   // neutral grey-white nodes
+        var EDGE='158,158,158';   // neutral grey edges (no blue)
         var GREEN='23,151,56';    // #179738, the only accent
 
         var sprite=function(rgb){

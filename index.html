@@ -429,7 +429,7 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
     <h2 class="rv">One screen, the whole story.</h2>
     <p class="lede rv">A miniature of a CLIP command center. Every figure is plain language, color coded on the number itself, and traceable to its source. The Executive Brief is open below; the rest of the surfaces are shown live in a walkthrough, on your own record.</p>
     <div class="execframe-wrap">
-      <iframe id="execframe" title="CLIP Executive Brief" src="exec_dashboard.html"></iframe>
+      <iframe id="execframe" src="exec.html" title="CLIP Executive Brief" style="width:100%;border:0;display:block;background:transparent" scrolling="no"></iframe>
     </div>
 
     <div class="think rv">
@@ -865,6 +865,6 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
   }catch(e){}
 })();
 </script>
-<script>(function(){var f=document.getElementById('execframe');if(!f)return;function fit(){try{var d=f.contentDocument||f.contentWindow.document;var b=d.body,e=d.documentElement;var h=Math.max(b.scrollHeight,b.offsetHeight);if(h>260)f.style.height=h+'px';}catch(err){}}f.addEventListener('load',function(){fit();[120,350,800,1500,2600].forEach(function(t){setTimeout(fit,t);});try{var d=f.contentDocument;new ResizeObserver(fit).observe(d.body);if(d.fonts&&d.fonts.ready)d.fonts.ready.then(fit);}catch(err){}});addEventListener('resize',fit);})();</script>
+<script>(function(){var f=document.getElementById('execframe');if(!f)return;function fit(){try{var d=f.contentWindow.document;f.style.height='60px';f.style.height=Math.max(d.documentElement.scrollHeight,d.body.scrollHeight)+'px';}catch(e){}}f.addEventListener('load',function(){fit();[100,350,800,1500,2600].forEach(function(t){setTimeout(fit,t);});try{var d=f.contentWindow.document;new ResizeObserver(fit).observe(d.body);if(d.fonts&&d.fonts.ready)d.fonts.ready.then(fit);}catch(e){}});addEventListener('resize',fit);})();</script>
 </body>
 </html>

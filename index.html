@@ -313,7 +313,7 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
 .js .hero .wrap>.vprops{opacity:0;transform:translateY(16px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
 .js .hero.lit .wrap>.vprops{opacity:1;transform:none;transition-delay:.36s}
 .execframe-wrap{margin-top:28px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#09090a}
-#execframe{width:100%;height:1300px;border:0;display:block}
+#execframe{width:100%;height:1900px;border:0;display:block}
 </style>
 </head>
 <body>
@@ -430,14 +430,6 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
     <p class="lede rv">A miniature of a CLIP command center. Every figure is plain language, color coded on the number itself, and traceable to its source. The Executive Brief is open below; the rest of the surfaces are shown live in a walkthrough, on your own record.</p>
     <div class="execframe-wrap">
       <iframe id="execframe" src="exec.html" title="CLIP Executive Brief" style="width:100%;border:0;display:block;background:transparent" scrolling="no"></iframe>
-    </div>
-
-    <div class="think rv">
-      <div class="th">How it thinks &middot; from a live build, identifiers removed</div>
-      <div class="thinkline"><span class="tn">READ</span><span>CLIP identified <b>47 open issues</b> affecting energization readiness.</span></div>
-      <div class="thinkline"><span class="tn">RANK</span><span>It determined <b>8</b> required executive attention this week.</span></div>
-      <div class="thinkline"><span class="tn">POINT</span><span>It highlighted <b>3 vendors</b> driving <span class="risk">62% of unresolved risk</span>.</span></div>
-      <div class="tclose">That is the product. Not the records, the read.</div>
     </div>
   </div>
 </section>
@@ -885,5 +877,6 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;background:var(--bg2
 })();
 </script>
 <script>(function(){var f=document.getElementById('execframe');if(!f)return;function fit(){try{var d=f.contentWindow.document;f.style.height='60px';f.style.height=Math.max(d.documentElement.scrollHeight,d.body.scrollHeight)+'px';}catch(e){}}f.addEventListener('load',function(){fit();[100,350,800,1500,2600].forEach(function(t){setTimeout(fit,t);});try{var d=f.contentWindow.document;new ResizeObserver(fit).observe(d.body);if(d.fonts&&d.fonts.ready)d.fonts.ready.then(fit);}catch(e){}});addEventListener('resize',fit);})();</script>
+<script>window.addEventListener("message",function(e){var d=e?e.data:0;if(d){if(d.type==="clip-exec-height"){var f=document.getElementById("execframe");if(f){if(d.height){f.style.height=d.height+"px";}}}}},false);</script>
 </body>
 </html>
